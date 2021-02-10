@@ -1,16 +1,8 @@
 package main
 
 import (
-	"compress/gzip"
-	"encoding/json"
 	"fmt"
-	"io"
-	"log"
 	"math/rand"
-	"net/http"
-	"net/url"
-	"os"
-	"strconv"
 	"time"
 )
 
@@ -61,70 +53,85 @@ func randomOption(options []string) string {
 }
 
 func main() {
-	resp, err := http.Get("https://index.commoncrawl.org/collinfo.json")
-	if err != nil {
-		log.Fatalln(err)
-	}
-	defer resp.Body.Close()
 
-	var cdxIndexes IndexCollection
+	poop := "Poopy di scoop Scoop diddy whoop Whoop di scoop di poop Poop di scoopty Scoopty whoop Whoopity scoop whoop poop Poop diddy whoop scoop Poop, poop Scoop diddy whoop Whoop diddy scoop Whoop diddy scoop, poop"
+	a := "Of course the actual implementation can get pretty hairy."
+	b := "The reason for this is that a search is actually more complex then it first appears."
+	c := "Take for example the following search term cool stuff. When someone searches for cool stuff they are expecting that a list of documents containing the words cool and stuff will appear in a list."
+	poo := []string{poop, a, b, c}
+	// concordance(poop)
+	index(poo)
 
-	if err := json.NewDecoder(resp.Body).Decode(&cdxIndexes); err != nil {
-		log.Fatalln(err)
-	}
+	fmt.Println("Done indexing...")
+	Search("search")
 
-	latestIndex := cdxIndexes[0].CdxAPI
+	// resp, err := http.Get("https://index.commoncrawl.org/collinfo.json")
+	// if err != nil {
+	// 	log.Fatalln(err)
+	// }
+	// defer resp.Body.Close()
 
-	req, err := http.NewRequest("GET", latestIndex, nil)
-	if err != nil {
-		log.Fatalln(err)
-	}
+	// var cdxIndexes IndexCollection
 
-	q := url.Values{}
-	q.Add("url", "reddit.com")
-	q.Add("limit", "2")
-	q.Add("output", "json")
+	// if err := json.NewDecoder(resp.Body).Decode(&cdxIndexes); err != nil {
+	// 	log.Fatalln(err)
+	// }
 
-	req.URL.RawQuery = q.Encode()
+	// latestIndex := cdxIndexes[0].CdxAPI
 
-	resp2, err := http.Get(req.URL.String())
-	if err != nil {
-		log.Fatalln(err)
-	}
-	defer resp2.Body.Close()
-	x := []IndexResult{}
+	// req, err := http.NewRequest("GET", latestIndex, nil)
+	// if err != nil {
+	// 	log.Fatalln(err)
+	// }
 
-	decoder := json.NewDecoder(resp2.Body)
-	for decoder.More() {
-		var result IndexResult
-		if err := decoder.Decode(&result); err != nil {
-			log.Fatalln(err)
-		}
+	// q := url.Values{}
+	// q.Add("url", "reddit.com")
+	// q.Add("limit", "10")
+	// q.Add("output", "json")
 
-		x = append(x, result)
-	}
+	// req.URL.RawQuery = q.Encode()
 
-	record := x[0]
-	fmt.Println(record)
-	prefixURL := "https://commoncrawl.s3.amazonaws.com/"
-	dataURL := prefixURL + record.Filename
-	startByte, err := strconv.Atoi(record.Offset)
-	recordLength, err := strconv.Atoi(record.Length)
-	endByte := startByte + recordLength + 1
+	// resp2, err := http.Get(req.URL.String())
+	// if err != nil {
+	// 	log.Fatalln(err)
+	// }
+	// defer resp2.Body.Close()
+	// x := []IndexResult{}
 
-	req2, err := http.NewRequest("GET", dataURL, nil)
-	req2.Header.Set("Range", fmt.Sprintf("bytes=%v-%v", startByte, endByte))
-	req.Header.Set("User-Agent", randomOption(userAgents))
+	// decoder := json.NewDecoder(resp2.Body)
+	// bar := pb.StartNew(10)
 
-	resp3, err := http.DefaultClient.Do(req2)
-	if err != nil {
-		log.Fatal(err)
-	}
+	// for decoder.More() {
+	// 	var result IndexResult
+	// 	if err := decoder.Decode(&result); err != nil {
+	// 		log.Fatalln(err)
+	// 	}
 
-	r, err := gzip.NewReader(resp3.Body)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	io.Copy(os.Stdout, r)
-	r.Close()
+	// 	x = append(x, result)
+	// 	bar.Increment()
+	// }
+
+	// record := x[0]
+	// fmt.Println(record)
+	// prefixURL := "https://commoncrawl.s3.amazonaws.com/"
+	// dataURL := prefixURL + record.Filename
+	// startByte, err := strconv.Atoi(record.Offset)
+	// recordLength, err := strconv.Atoi(record.Length)
+	// endByte := startByte + recordLength + 1
+
+	// req2, err := http.NewRequest("GET", dataURL, nil)
+	// req2.Header.Set("Range", fmt.Sprintf("bytes=%v-%v", startByte, endByte))
+	// req.Header.Set("User-Agent", randomOption(userAgents))
+
+	// resp3, err := http.DefaultClient.Do(req2)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// r, err := gzip.NewReader(resp3.Body)
+	// if err != nil {
+	// 	log.Fatalln(err)
+	// }
+	// io.Copy(os.Stdout, r)
+	// r.Close()
 }
