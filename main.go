@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"math/rand"
 	"time"
+
+	jsoniter "github.com/json-iterator/go"
 )
 
 type IndexCollection []struct {
@@ -51,6 +53,8 @@ func randomOption(options []string) string {
 	randNum := rand.Int() % len(options)
 	return options[randNum]
 }
+
+var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 func main() {
 
