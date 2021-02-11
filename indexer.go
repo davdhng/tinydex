@@ -1,45 +1,33 @@
 package main
 
 import (
-	"strings"
+	"encoding/gob"
+	"os"
 )
 
-// take a list of docs, clean, save to json, split by spaces, then build a concordance
-func index(docs []string) bool {
+type Index2 map[string][]int
+
+func (idx Index2) SaveToDisk() {
+	file, _ := os.Create("index.gob")
+	defer file.Close()
+
+	encoder := gob.NewEncoder(file)
+
+	encoder.Encode(idx)
+}
+
+func cleanText(text string) []string {
+	return filterStems(filterStopWords(filterLowercase(tokenize(text))))
+}
+
+func (idx Index2) addToIndex(docs []XMLDocument) {
 	for _, doc := range docs {
-		id := AddDoc(doc)
-		conc := concordance(doc)
-		for word, count := range conc {
-			ind := GetIndex(word)
-			if len(ind) == 0 {
-				x := Record{id, count}
-				thing := []Record{x}
-				AddRecords(word, thing)
-			} else {
-				x := Record{id, 0}
-				ind := []Record{x}
-				AddRecords(word, ind)
+		for _, token := range cleanText(doc.Text) {
+			ids := idx[token]
+			if ids != nil && ids[len(ids)-1] == doc.ID {
+				continue
 			}
+			idx[token] = append(ids, doc.ID)
 		}
 	}
-	return true
-}
-
-func concordance(content string) map[string]int {
-	words := strings.Split(content, " ")
-	conc := make(map[string]int, 100)
-	for _, word := range words {
-		word = strings.ToLower(word)
-		count, exists := conc[word]
-		if exists {
-			conc[word] = count + 1
-		} else {
-			conc[word] = 1
-		}
-	}
-	return conc
-}
-
-func cleanDoc(doc Document) {
-
 }
