@@ -39,8 +39,8 @@ func (idx Index2) search(text string) []int {
 
 func concordance(content string) map[string]int {
 	// words := strings.Split(content, " ")
-	words := filterStems(filterStopWords(filterLowercase(tokenize(content))))
-	conc := make(map[string]int, 100)
+	words := cleanText(content)
+	conc := make(map[string]int, len(content))
 	for _, word := range words {
 		count, exists := conc[word]
 		if exists {
