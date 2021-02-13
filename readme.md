@@ -1,6 +1,6 @@
 # Tinydex
 
-Mini search engine written in Go
+Mini full-text search engine written in Go
 
 Currently using a small portion of the [Wikipedia English abstract corpus](https://dumps.wikimedia.org/enwiki/latest/)
 
@@ -16,7 +16,7 @@ Currently using a small portion of the [Wikipedia English abstract corpus](https
 
 ### How to use
 
-1. Download the latest XML dump of the Wikipedia English abstract corpus (for example: `enwiki-latest-abstrac1.xml.gz`)
+1. Download the latest XML dump of the Wikipedia English abstract corpus (for example: `enwiki-latest-abstract1.xml.gz`)
 2. Unzip
 3. `go run main.go cleanup.go indexer.go loadDocs.go search.go`
 4. Wait a little while for your computer to load the entire Wikipedia corpus
