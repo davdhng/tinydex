@@ -20,10 +20,25 @@ func filter(IDs []int, Docs []XMLDocument) (ret []XMLDocument) {
 }
 
 func main() {
-	fmt.Println("Loading wikipedia...")
-	docs := LoadWikipedia()
+	if _, err := os.Stat("wiki.gob"); os.IsNotExist(err) {
+		fmt.Println("Loading wikipedia...")
+		fmt.Println("We only need to do this once...")
+		docs := LoadWikipedia()
+		file, _ := os.Create("wiki.gob")
+		defer file.Close()
+
+		encoder := gob.NewEncoder(file)
+
+		encoder.Encode(docs)
+		log.Println("Saved Wikipedia corpus to disk")
+	}
+
+	fmt.Println("Loading saved Wikipedia corpus...")
+	docs := LoadCorpus()
+
 	if _, err := os.Stat("index.gob"); os.IsNotExist(err) {
 		fmt.Println("Creating index...")
+		fmt.Println("We only need to do this once...")
 		start := time.Now()
 		idx := make(Index2)
 		idx.addToIndex(docs)
@@ -31,8 +46,10 @@ func main() {
 		idx.SaveToDisk()
 		log.Println("Saved index to disk")
 	}
+
 	idx := LoadIndex()
 	fmt.Println("Loaded saved index")
+
 	r := gin.Default()
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
@@ -58,6 +75,21 @@ func LoadWikipedia() []XMLDocument {
 	}
 	log.Printf("Loaded %d documents in %v", len(docs), time.Since(start))
 	return docs
+}
+
+func LoadCorpus() []XMLDocument {
+	corpus := []XMLDocument{}
+
+	f, err := os.Open("wiki.gob")
+	if err != nil {
+		panic("cant open file")
+	}
+	defer f.Close()
+	enc := gob.NewDecoder(f)
+	if err := enc.Decode(&corpus); err != nil {
+		panic("cant decode")
+	}
+	return corpus
 }
 
 func LoadIndex() Index2 {
