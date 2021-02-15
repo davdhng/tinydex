@@ -21,7 +21,7 @@ func intersection(a []int, b []int) []int {
 	return r
 }
 
-func (idx Index2) search(text string) []int {
+func (idx Index) search(text string) []int {
 	var r []int
 	for _, token := range cleanText(text) {
 		if ids, ok := idx[token]; ok {

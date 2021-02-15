@@ -18,8 +18,8 @@ func filter(IDs []int, Docs []XMLDocument) (ret []XMLDocument) {
 	}
 	return
 }
-
 func main() {
+
 	if _, err := os.Stat("wiki.gob"); os.IsNotExist(err) {
 		fmt.Println("Loading wikipedia...")
 		fmt.Println("We only need to do this once...")
@@ -40,7 +40,7 @@ func main() {
 		fmt.Println("Creating index...")
 		fmt.Println("We only need to do this once...")
 		start := time.Now()
-		idx := make(Index2)
+		idx := make(Index)
 		idx.addToIndex(docs)
 		log.Printf("Indexed %d documents in %v", len(docs), time.Since(start))
 		idx.SaveToDisk()
@@ -92,8 +92,8 @@ func LoadCorpus() []XMLDocument {
 	return corpus
 }
 
-func LoadIndex() Index2 {
-	i2 := make(Index2)
+func LoadIndex() Index {
+	i2 := make(Index)
 
 	f, err := os.Open("index.gob")
 	if err != nil {

@@ -5,9 +5,9 @@ import (
 	"os"
 )
 
-type Index2 map[string][]int
+type Index map[string][]int
 
-func (idx Index2) SaveToDisk() {
+func (idx Index) SaveToDisk() {
 	file, _ := os.Create("index.gob")
 	defer file.Close()
 
@@ -20,7 +20,7 @@ func cleanText(text string) []string {
 	return filterStems(filterStopWords(filterLowercase(tokenize(text))))
 }
 
-func (idx Index2) addToIndex(docs []XMLDocument) {
+func (idx Index) addToIndex(docs []XMLDocument) {
 	for _, doc := range docs {
 		for _, token := range cleanText(doc.Text) {
 			ids := idx[token]
